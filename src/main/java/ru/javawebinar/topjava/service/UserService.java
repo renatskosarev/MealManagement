@@ -5,7 +5,10 @@ import org.springframework.stereotype.Service;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.repository.UserRepository;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
+import ru.javawebinar.topjava.web.SecurityUtil;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static ru.javawebinar.topjava.util.ValidationUtil.checkNotFound;
@@ -38,7 +41,7 @@ public class UserService {
     }
 
     public List<User> getAll() {
-        return repository.getAll();
+        return new ArrayList<>(repository.getAll());
     }
 
     public void update(User user) throws NotFoundException {
