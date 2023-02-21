@@ -45,6 +45,8 @@ public class Meal extends AbstractBaseEntity {
         return dateTime.toLocalTime();
     }
 
+
+
     public boolean isNew() {
         return id == null;
     }
@@ -54,14 +56,14 @@ public class Meal extends AbstractBaseEntity {
     }
 
 
-
     @Override
     public String toString() {
         return "Meal{" +
-                "id=" + id +
+                "userId=" + userId +
                 ", dateTime=" + dateTime +
                 ", description='" + description + '\'' +
                 ", calories=" + calories +
+                ", id=" + id +
                 '}';
     }
 }
