@@ -1,3 +1,4 @@
+DROP INDEX unique_time;
 DROP TABLE IF EXISTS meals;
 DROP TABLE IF EXISTS user_roles;
 DROP TABLE IF EXISTS users;
@@ -34,4 +35,6 @@ CREATE TABLE meals
     user_id     INTEGER   NOT NULL,
 
     FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
-)
+);
+
+CREATE UNIQUE INDEX unique_time ON meals (user_id, date_time);
