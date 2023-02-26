@@ -4,15 +4,21 @@ import org.hibernate.validator.constraints.Range;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
+@NamedQueries({
+        @NamedQuery(name = Meal.DELETE, query = "DELETE FROM Meal m WHERE m.id=:id AND m.user.id=:userId"),
+        @NamedQuery(name = Meal.ALL, query = "SELECT m FROM Meal m WHERE m.user.id=:userId"),
+})
 @Entity
 @Table(name = "meals")
 public class Meal extends AbstractBaseEntity {
+    public static final String DELETE = "Meal.delete";
+    public static final String ALL = "Meal.getAll";
+
     @Column(name = "date_time", nullable = false)
     private LocalDateTime dateTime;
 
