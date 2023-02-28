@@ -12,6 +12,9 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import static ru.javawebinar.topjava.util.DateTimeUtil.getEndExclusive;
+import static ru.javawebinar.topjava.util.DateTimeUtil.getStartInclusive;
+
 @Repository
 @Transactional(readOnly = true)
 public class JpaMealRepository implements MealRepository {
@@ -22,16 +25,16 @@ public class JpaMealRepository implements MealRepository {
     @Override
     @Transactional
     public Meal save(Meal meal, int userId) {
+        if (!meal.isNew() && get(meal.getId(), userId) == null) {
+            return null;
+        }
+        meal.setUser(em.getReference(User.class, userId));
         if (meal.isNew()) {
-            meal.setUser(em.getReference(User.class, userId));
             em.persist(meal);
             return meal;
         } else {
-            if (get(meal.getId(), userId) != null) {
-                return em.merge(meal);
-            }
+            return em.merge(meal);
         }
-        return null;
     }
 
     @Override
@@ -48,19 +51,23 @@ public class JpaMealRepository implements MealRepository {
         if (em.find(Meal.class, id).getUser().getId() == userId) {
             return em.find(Meal.class, id);
         }
-        return null;
+        Meal meal = em.find(Meal.class, id);
+        return meal != null && meal.getUser().getId() == userId ? meal : null;
     }
 
     @Override
     public List<Meal> getAll(int userId) {
-        return em.createNamedQuery(Meal.ALL, Meal.class)
+        return em.createNamedQuery(Meal.ALL_SORTED, Meal.class)
                 .setParameter("userId", userId)
                 .getResultList();
     }
 
     @Override
     public List<Meal> getBetweenInclusive(LocalDate startDate, LocalDate endDate, int userId) {
-        // not implemented
-        return new ArrayList<>();
+        return em.createNamedQuery(Meal.GET_BETWEEN, Meal.class)
+                .setParameter("userId", userId)
+                .setParameter("startDate", getStartInclusive(startDate))
+                .setParameter("endDate", getEndExclusive(endDate))
+                .getResultList();
     }
 }
