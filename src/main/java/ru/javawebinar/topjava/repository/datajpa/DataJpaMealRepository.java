@@ -5,42 +5,55 @@ import org.springframework.stereotype.Repository;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.repository.MealRepository;
 
-import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 @Repository
 public class DataJpaMealRepository implements MealRepository {
 
+    private final CrudMealRepository crudMealRepository;
+    private final CrudUserRepository crudUserRepository;
+
     @Autowired
-    private CrudMealRepository crudRepository;
+    public DataJpaMealRepository(CrudMealRepository crudMealRepository, CrudUserRepository crudUserRepository) {
+        this.crudMealRepository = crudMealRepository;
+        this.crudUserRepository = crudUserRepository;
+    }
 
     @Override
     public Meal save(Meal meal, int userId) {
-        if (!meal.isNew() && get(meal.getId(), userId) != null) {
+        if (!meal.isNew() && get(meal.getId(), userId) == null) {
             return null;
         }
-
-        return crudRepository.save(meal);
+        meal.setUser(crudUserRepository.getOne(userId));
+        return crudMealRepository.save(meal);
     }
 
     @Override
     public boolean delete(int id, int userId) {
-        return crudRepository.deleteByIdAndUserId(id, userId) == 1;
+        return crudMealRepository.deleteByIdAndUserId(id, userId) == 1;
     }
 
     @Override
     public Meal get(int id, int userId) {
-        return crudRepository.findByIdAndUserId(id, userId);
+        return crudMealRepository.findByIdAndUserId(id, userId);
     }
 
     @Override
     public List<Meal> getAll(int userId) {
-        return crudRepository.findAllByUserId(userId);
+        return crudMealRepository.findAllByUserIdOrderByDateTimeDesc(userId);
     }
 
     @Override
     public List<Meal> getBetweenInclusive(LocalDate startDate, LocalDate endDate, int userId) {
-        return crudRepository.findAllByDateTimeBetweenAndUserId(startDate, endDate, userId);
+        if (startDate == null) {
+            startDate = LocalDate.of(2000, 1, 1);
+        }
+        if (endDate == null) {
+            endDate = LocalDate.of(3000, 1, 1);
+        }
+        return crudMealRepository.getBetween(LocalDateTime.of(startDate, LocalTime.MIN), LocalDateTime.of(endDate, LocalTime.MAX), userId);
     }
 }
