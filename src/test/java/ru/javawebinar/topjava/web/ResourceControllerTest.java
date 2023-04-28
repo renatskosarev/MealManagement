@@ -17,7 +17,7 @@ class ResourceControllerTest extends AbstractControllerTest {
     void resources() throws Exception {
         perform(doGet())
                 .andDo(print())
-                .andExpect(content().contentType(MediaType.valueOf("text/css")))
+                .andExpect(content().contentType(MediaType.valueOf("text/css;charset=UTF-8")))
                 .andExpect(status().isOk());
     }
 }
